@@ -2,30 +2,28 @@ const { createApp } = Vue;
 createApp({
     data(){
         return{
-            name:'',
-            email:'',
-            website:'',
-            comment:'',
-            upload:'',
-            users:[]
+            fullname:'',
+            username:'',
+            password:'',
+            role:'',
+            users:[],
+            userid:0
         }
     },
     methods:{
         insertGuest:function(e){
             e.preventDefault();
             var form = e.currentTarget;
-            
+
             const vue = this;
             var data = new FormData(form);
             data.append("method","doInsertGuest");
-            
             axios.post('includes/midtermVue.php',data)
             .then(function(r){
                 if(r.data == 0){
-                    // alert('User successfully saved');
-                    alert(r.data);
                     vue.getGuest();
-                    document.querySelector(".submitForm").reset();
+                    // document.querySelector(".userForm").reset();
+                    location.reload();
                 }
                 else if(r.data == 1){
                     alert('User already exists');
@@ -38,24 +36,24 @@ createApp({
         getGuest:function(){
             var data = new FormData();
             const vue = this;
-            data.append('method','getUsers');
-            axios.post('includes/model.php',data)
+            data.append('method','doGetGuest');
+            axios.post('includes/midtermVue.php',data)
             .then(function(r){
                 vue.users = [];
                 for(var v of r.data){
                     vue.users.push({
-                        fullname: v.fullname,
-                        username: v.username,
-                        role: v.role,
-                        dateInserted: v.dateInserted,
-                        userid: v.userid,
-                        profilepic: v.profilepic
+                        guest_name: v.guest_name,
+                        email: v.email,
+                        website: v.website,
+                        comment: v.comment,
+                        dateinserted: v.dateinserted,
+                        photo: v.photo
                     })
                 }
-                // r.data.forEach(function(v){
-                    
-                // })
             })
         }
+    },
+    created:function(){
+        this.getGuest();
     }
 }).mount('#app')

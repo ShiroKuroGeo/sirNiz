@@ -8,7 +8,7 @@
     else{
         echo 'Function not exists';
     }
-    doInsertGuest();
+
     function doInsertGuest(){
         global $con;
 
@@ -20,39 +20,34 @@
         
         $location = "../pictures/";
         $filename = '';
-        if(isset($_FILES['file']['name'])){
+        if(isset($_FILES['upload']['name'])){
             
-            $finalfile = $location . $_FILES["file"]['name'];
-            if(move_uploaded_file($_FILES['file']['tmp_name'],$finalfile))
+            $finalfile = $location . $_FILES["upload"]['name'];
+            if(move_uploaded_file($_FILES['upload']['tmp_name'],$finalfile))
             {
-                $filename = $_FILES["file"]['name'];
+                $filename = $_FILES["upload"]['name'];
             }
             else{
                 $filename = 'backblue.gif';
             }
             
         }else{
-            return "200";
+
         }
 
-        $query = $con->prepare("INSERT INTO `tbl_guests`(`guest_name`, `email`, `website`, `comment`, `photo`, `dateinserted`) VALUES (?,?,?,?,?,?)");
+        $query = $con->prepare(insertQuery());
         $query->bind_param('ssssss',$name,$email,$website,$comment,$filename,$now);
         $query->execute();
         $result = $query->get_result();
-        $data = "";
-        while($row = $result->fetch_array())
-        {
-            $data = $row[0];
-        }
-        echo "WAt";
-
+        echo $result;
+        
         $query->close();
         $con->close();
 
     }
 
     //SELECT ALL FROM TABLE
-    function getGuest(){
+    function doGetGuest(){
         global $con;
         $query = $con->prepare(getGuestQuery());
         $query->execute();
@@ -71,6 +66,6 @@
         return "INSERT INTO `tbl_guests`(`guest_name`, `email`, `website`, `comment`, `photo`, `dateinserted`) VALUES (?,?,?,?,?,?)";
     }
     function getGuestQuery(){
-        return "SELECT guest_name, email, website, comment, photo, dateinserted FROM tbl_guests";
+        return "SELECT `guestid`, `guest_name`, `email`, `website`, `comment`, `photo`, `dateinserted` FROM `tbl_guests` WHERE 1";
     }
 ?>
